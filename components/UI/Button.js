@@ -1,9 +1,9 @@
-import { Text, View, Pressable, StyleSheet } from "react-native";
-import { GlobalStyles } from "../../constants/style";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { GlobalStyles } from "../../constants/styles";
 
-function Button({ children, onPress, mode }) {
+function Button({ children, onPress, mode, style }) {
   return (
-    <View style={styles}>
+    <View style={style}>
       <Pressable
         onPress={onPress}
         style={({ pressed }) => pressed && styles.pressed}
@@ -18,6 +18,8 @@ function Button({ children, onPress, mode }) {
   );
 }
 
+export default Button;
+
 const styles = StyleSheet.create({
   button: {
     borderRadius: 4,
@@ -29,6 +31,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
+    textAlign: "center",
   },
   flatText: {
     color: GlobalStyles.colors.primary200,
@@ -39,5 +42,3 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
-
-export default Button;

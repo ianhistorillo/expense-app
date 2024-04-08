@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
-import ManageExpenses from "./screens/ManageExpenses";
+import ManageExpense from "./screens/ManageExpenses";
 import RecentExpenses from "./screens/RecentExpenses";
 import AllExpenses from "./screens/AllExpenses";
-import { GlobalStyles } from "./constants/style";
+import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
 
@@ -51,7 +51,7 @@ function ExpensesOverview() {
         component={AllExpenses}
         options={{
           title: "All Expenses",
-          tabBarLabel: "All Expnses",
+          tabBarLabel: "All Expenses",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
           ),
@@ -64,7 +64,7 @@ function ExpensesOverview() {
 export default function App() {
   return (
     <React.Fragment>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <ExpensesContextProvider>
         <NavigationContainer>
           <Stack.Navigator
@@ -80,8 +80,10 @@ export default function App() {
             />
             <Stack.Screen
               name="ManageExpense"
-              component={ManageExpenses}
-              options={{ presentation: "modal" }}
+              component={ManageExpense}
+              options={{
+                presentation: "modal",
+              }}
             />
           </Stack.Navigator>
         </NavigationContainer>
