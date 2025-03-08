@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import * as SplashScreen from "expo-splash-screen";
 
 import ManageExpense from "./screens/ManageExpenses";
 import RecentExpenses from "./screens/RecentExpenses";
@@ -12,22 +13,29 @@ import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
 import { init } from "./util/database";
-import AppLoading from "expo-app-loading";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 function ExpensesOverview() {
-  const [dbInitialized, setDbInitialized] = useState();
+  const [dbInitialized, setDbInitialized] = useState(false);
 
   useEffect(() => {
+    // Prevent the splash screen from auto-hiding
+    SplashScreen.preventAutoHideAsync();
+
     init().then(() => {
       setDbInitialized(true);
+      // Hide the splash screen once the data is ready
+      SplashScreen.hideAsync();
     });
+
+    // Cleanup function to hide splash screen in case of an unmount
+    return () => SplashScreen.hideAsync();
   }, []);
 
   if (!dbInitialized) {
-    return <AppLoading />;
+    return null; // Show nothing while the database is being initialized
   }
 
   return (
