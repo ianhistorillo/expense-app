@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
 
-function ExpenseItem({ id, description, amount, date }) {
+function ExpenseItem({ amount, type, description, date, id }) {
   const navigation = useNavigation();
 
   function expensePressHandler() {
@@ -26,7 +26,7 @@ function ExpenseItem({ id, description, amount, date }) {
           <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>{amount.toFixed(2)}</Text>
+          <Text style={styles.amount}>₱{amount}</Text>
         </View>
       </View>
     </Pressable>

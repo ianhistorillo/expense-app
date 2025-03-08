@@ -1,26 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Alert } from "react-native";
-
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
 
 function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
+  // State initialization
   const [inputs, setInputs] = useState({
     amount: {
-      value: defaultValues ? defaultValues.amount.toString() : "",
+      value: "",
       isValid: true,
     },
     date: {
-      value: defaultValues ? getFormattedDate(defaultValues.date) : "",
+      value: "",
       isValid: true,
     },
     description: {
-      value: defaultValues ? defaultValues.description : "",
+      value: "",
+      isValid: true,
+    },
+    type: {
+      value: "",
       isValid: true,
     },
   });
+
+  // UseEffect to update inputs when defaultValues change (when editing an existing expense)
+  useEffect(() => {
+    if (defaultValues) {
+      setInputs({
+        amount: {
+          value: defaultValues.amount ? defaultValues.amount.toString() : "",
+          isValid: true,
+        },
+        date: {
+          value: defaultValues.date ? getFormattedDate(defaultValues.date) : "",
+          isValid: true,
+        },
+        description: {
+          value: defaultValues.description || "",
+          isValid: true,
+        },
+        type: {
+          value: defaultValues.type ? defaultValues.type.toString() : "",
+          isValid: true,
+        },
+      });
+    }
+  }, [defaultValues]); // This will run every time defaultValues change
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {
@@ -36,14 +64,15 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       amount: +inputs.amount.value,
       date: new Date(inputs.date.value),
       description: inputs.description.value,
+      type: inputs.type.value,
     };
 
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;
+    const typeIsValid = expenseData.type;
 
-    if (!amountIsValid || !dateIsValid || !descriptionIsValid) {
-      // Alert.alert('Invalid input', 'Please check your input values');
+    if (!amountIsValid || !dateIsValid || !descriptionIsValid || !typeIsValid) {
       setInputs((curInputs) => {
         return {
           amount: { value: curInputs.amount.value, isValid: amountIsValid },
@@ -52,6 +81,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
             value: curInputs.description.value,
             isValid: descriptionIsValid,
           },
+          type: { value: curInputs.type.value, isValid: typeIsValid },
         };
       });
       return;
@@ -63,7 +93,8 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   const formIsInvalid =
     !inputs.amount.isValid ||
     !inputs.date.isValid ||
-    !inputs.description.isValid;
+    !inputs.description.isValid ||
+    !inputs.type.isValid;
 
   return (
     <View style={styles.form}>
@@ -93,12 +124,23 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       </View>
       <View style={styles.inputsRow}>
         <Input
+          style={styles.rowInput}
+          label="Type"
+          invalid={!inputs.type.isValid}
+          textInputConfig={{
+            placeholder: "Ex. Food",
+            maxLength: 15,
+            onChangeText: inputChangedHandler.bind(this, "type"),
+            value: inputs.type.value,
+          }}
+        />
+      </View>
+      <View style={styles.inputsRow}>
+        <Input
           label="Description"
           invalid={!inputs.description.isValid}
           textInputConfig={{
             multiline: true,
-            // autoCapitalize: 'none'
-            // autoCorrect: false // default is true
             onChangeText: inputChangedHandler.bind(this, "description"),
             value: inputs.description.value,
           }}

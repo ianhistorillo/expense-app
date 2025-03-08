@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,11 +11,25 @@ import AllExpenses from "./screens/AllExpenses";
 import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
+import { init } from "./util/database";
+import AppLoading from "expo-app-loading";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 function ExpensesOverview() {
+  const [dbInitialized, setDbInitialized] = useState();
+
+  useEffect(() => {
+    init().then(() => {
+      setDbInitialized(true);
+    });
+  }, []);
+
+  if (!dbInitialized) {
+    return <AppLoading />;
+  }
+
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({

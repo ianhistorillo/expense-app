@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { ExpensesContext } from "../store/expenses-context";
+import { getFormattedDate } from "../util/date";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses } from "../util/http";
 import { Alert } from "react-native";
@@ -39,8 +40,10 @@ function RecentExpenses() {
   const recentExpenses = expensesCtx.expenses.filter((expense) => {
     const today = new Date();
     const date7DaysAgo = getDateMinusDays(today, 7);
+    const expenseDate = new Date(expense.date); // Make sure date is a valid Date string or format
 
-    return expense.date >= date7DaysAgo && expense.date <= today;
+    // Ensure you are comparing only the date parts without the time part
+    return expenseDate >= date7DaysAgo && expenseDate <= today;
   });
 
   return (

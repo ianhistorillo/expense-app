@@ -4,13 +4,17 @@ import { GlobalStyles } from "../../constants/styles";
 
 function ExpensesSummary({ expenses, periodName }) {
   const expensesSum = expenses.reduce((sum, expense) => {
-    return sum + expense.amount;
+    const amount = parseFloat(expense.amount);
+    if (!isNaN(amount)) {
+      return sum + amount;
+    }
+    return sum;
   }, 0);
 
   return (
     <View style={styles.container}>
       <Text style={styles.period}>{periodName}</Text>
-      <Text style={styles.sum}>${expensesSum.toFixed(2)}</Text>
+      <Text style={styles.sum}>₱{expensesSum.toFixed(2)}</Text>
     </View>
   );
 }

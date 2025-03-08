@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "practice-app",
-    "slug": "practice-app",
+    "name": "ExpenseTracker",
+    "slug": "ExpenseTracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,16 +15,25 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "buildNumber": "1.0.0",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ianhistorillo.ExpenseTracker"
     },
     "android": {
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ianhistorillo.ExpenseTracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f34e49e8-4d8b-4e90-a8ca-72c2cb0742b0"
+      }
     }
   }
 }
