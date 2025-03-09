@@ -1,132 +1,99 @@
 import * as SQLite from "expo-sqlite";
 import { getFormattedDate } from "./date";
 
-const database = SQLite.openDatabase("finance-tracker.db");
+export async function init() {
+  try {
+    // Open the database asynchronously
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db");
 
-export function init() {
-  const promise = new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS expenses (
-            id INTEGER PRIMARY KEY NOT NULL,
-            amount TEXT NOT NULL,
-            date TEXT NOT NULL,
-            description TEXT NOT NULL,
-            type TEXT NOT NULL
-        )`,
-        [],
-        () => {
-          resolve();
-        },
-        (_, error) => {
-          reject(error);
-        }
+    // Create the table and insert initial data using execAsync
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS expenses (
+        id INTEGER PRIMARY KEY NOT NULL,
+        amount TEXT NOT NULL,
+        date TEXT NOT NULL,
+        description TEXT NOT NULL,
+        type TEXT NOT NULL
       );
-    });
-  });
-
-  return promise;
+      INSERT INTO expenses (amount, date, description, type) VALUES
+      ('100', '2025-03-08', 'Sample Expense 1', 'food'),
+      ('50', '2025-03-07', 'Sample Expense 2', 'transport');
+    `);
+  } catch (error) {
+    console.error("Database error:", error);
+  }
 }
 
-export function insertExpenses(expense) {
-  const promise = new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      const formattedDate = getFormattedDate(expense.date); // Ensure correct date format
+export async function insertExpenses(expense) {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+    const formattedDate = getFormattedDate(expense.date); // Ensure correct date format
 
-      tx.executeSql(
-        `INSERT INTO expenses (amount, date, description, type) VALUES (?, ?, ?, ?)`,
-        [
-          expense.amount,
-          formattedDate, // Use the formatted date
-          expense.description,
-          expense.type,
-        ],
-        (_, result) => {
-          resolve(result);
-        },
-        (_, error) => {
-          reject(error);
-        }
-      );
-    });
-  });
+    const result = await db.runAsync(
+      `INSERT INTO expenses (amount, date, description, type) VALUES (?, ?, ?, ?)`,
+      [expense.amount, formattedDate, expense.description, expense.type] // Bind parameters
+    );
 
-  return promise;
+    return result; // Return the result
+  } catch (error) {
+    console.error("Error inserting expense:", error);
+    throw error; // Handle or rethrow the error
+  }
 }
 
-export function fetchListOfExpenses() {
-  const promise = new Promise((resolve, reject) => {
-    database.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM expenses", // Query to fetch all expenses
-        [],
-        (_, result) => {
-          const expensesItem = [];
+export async function fetchListOfExpenses() {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
 
-          for (const exp of result.rows._array) {
-            let formattedDate = null;
+    // Fetch all expenses using getAllAsync
+    const result = await db.getAllAsync("SELECT * FROM expenses");
+    const expensesItem = [];
 
-            // Check if the date exists and is not empty
-            if (exp.date && exp.date.trim() !== "") {
-              // Attempt to parse the date
-              const parsedDate = new Date(exp.date);
+    // Format the date and handle missing/invalid dates
+    for (const exp of result) {
+      let formattedDate = null;
 
-              // Check if the parsed date is valid
-              if (!isNaN(parsedDate.getTime())) {
-                // If valid, format the date
-                formattedDate = getFormattedDate(parsedDate);
-              } else {
-                // If the date is invalid, log a warning and use fallback
-                // console.warn(
-                //   `Invalid date format for expense ID: ${exp.id}. Using fallback.`
-                // );
-                formattedDate = "Invalid date"; // Or you can use "No date available"
-              }
-            } else {
-              // If the date is missing, use the fallback
-              //   console.warn(
-              //     `Missing date for expense ID: ${exp.id}. Using fallback.`
-              //   );
-              formattedDate = "Invalid date"; // Or you can use "No date available"
-            }
-
-            // Push the formatted expense into the expenses array
-            expensesItem.push({
-              amount: exp.amount,
-              date: formattedDate, // Use the formatted date or fallback
-              description: exp.description,
-              type: exp.type,
-              id: exp.id,
-            });
-          }
-
-          // Resolve the promise with the processed expenses array
-          resolve(expensesItem);
-        },
-        (_, error) => {
-          console.error(error);
-          reject(error);
+      if (exp.date && exp.date.trim() !== "") {
+        const parsedDate = new Date(exp.date);
+        if (!isNaN(parsedDate.getTime())) {
+          formattedDate = getFormattedDate(parsedDate); // Format the date if valid
+        } else {
+          formattedDate = "Invalid date"; // Fallback if the date is invalid
         }
-      );
-    });
-  });
+      } else {
+        formattedDate = "Invalid date"; // Fallback for missing date
+      }
 
-  return promise;
+      expensesItem.push({
+        amount: exp.amount,
+        date: formattedDate,
+        description: exp.description,
+        type: exp.type,
+        id: exp.id,
+      });
+    }
+
+    return expensesItem; // Return the formatted expenses array
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    throw error; // Handle or rethrow the error
+  }
 }
 
 export async function updateExpenseItem(expenseId, expense) {
+  console.log("Updating: ", expense);
+  console.log("UpdatingID: ", expenseId);
   try {
-    // Convert date to proper format if it exists
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
     let formattedDate = "Invalid date"; // Default fallback value
     const expenseItemDate = expense.date;
 
-    // Check if the date exists and is a valid string
+    // Check if the date exists and is valid
     if (expenseItemDate) {
       const parsedDate = new Date(expenseItemDate);
-
-      // Ensure the date is valid
       if (!isNaN(parsedDate.getTime())) {
-        formattedDate = getFormattedDate(parsedDate); // Format the valid date
+        formattedDate = getFormattedDate(parsedDate); // Format if valid
       } else {
         console.warn(
           `Invalid date format for expense ID ${expenseId}: ${expenseItemDate}`
@@ -134,48 +101,37 @@ export async function updateExpenseItem(expenseId, expense) {
       }
     }
 
-    const result = await new Promise((resolve, reject) => {
-      database.transaction((tx) => {
-        tx.executeSql(
-          `UPDATE expenses SET amount = ?, description = ?, type = ?, date = ? WHERE id = ?`, // Update statement
-          [
-            expense.amount,
-            expense.description,
-            expense.type,
-            formattedDate,
-            expenseId,
-          ], // Bind parameters
-          (_, result) => resolve(result),
-          (_, error) => reject(error)
-        );
-      });
-    });
+    const result = await db.runAsync(
+      `UPDATE expenses SET amount = ?, description = ?, type = ?, date = ? WHERE id = ?`,
+      [
+        expense.amount,
+        expense.description,
+        expense.type,
+        formattedDate,
+        expenseId,
+      ] // Bind parameters
+    );
 
     console.log(`Expense with ID ${expenseId} updated successfully.`);
-    return result; // Return the result of the update (optional)
+    return result; // Return result after updating
   } catch (error) {
     console.error("Error updating expense:", error);
-    throw error; // Optionally re-throw or handle the error
+    throw error; // Handle or rethrow the error
   }
 }
 
-// Function to delete an expense by id
-export function deleteExpenseById(expenseId) {
-  const promise = new Promise((resolve, reject) => {
-    // Begin transaction to delete data
-    database.transaction((tx) => {
-      tx.executeSql(
-        "DELETE FROM expenses WHERE id = ?;", // SQL query to delete the record
-        [expenseId], // The expenseId to be passed in the query
-        (_, result) => {
-          resolve(result); // Resolves if deletion is successful
-        },
-        (_, error) => {
-          reject(error); // Rejects if there's an error
-        }
-      );
-    });
-  });
+export async function deleteExpenseById(expenseId) {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+    const result = await db.runAsync(
+      "DELETE FROM expenses WHERE id = ?;", // SQL query to delete the record
+      [expenseId] // Bind the expenseId to the query
+    );
 
-  return promise;
+    console.log(`Expense with ID ${expenseId} deleted successfully.`);
+    return result; // Return result after deletion
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    throw error; // Handle or rethrow the error
+  }
 }

@@ -4,7 +4,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import * as SplashScreen from "expo-splash-screen";
 
 import ManageExpense from "./screens/ManageExpenses";
 import RecentExpenses from "./screens/RecentExpenses";
@@ -22,16 +21,11 @@ function ExpensesOverview() {
 
   useEffect(() => {
     // Prevent the splash screen from auto-hiding
-    SplashScreen.preventAutoHideAsync();
 
     init().then(() => {
       setDbInitialized(true);
       // Hide the splash screen once the data is ready
-      SplashScreen.hideAsync();
     });
-
-    // Cleanup function to hide splash screen in case of an unmount
-    return () => SplashScreen.hideAsync();
   }, []);
 
   if (!dbInitialized) {

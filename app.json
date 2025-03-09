@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "buildNumber": "1.0.0",
       "supportsTablet": true,
@@ -34,6 +32,8 @@
       "eas": {
         "projectId": "f34e49e8-4d8b-4e90-a8ca-72c2cb0742b0"
       }
-    }
+    },
+    "plugins": ["expo-sqlite"],
+    "sdkVersion": "52.0.0"
   }
 }
