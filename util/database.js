@@ -16,9 +16,6 @@ export async function init() {
         description TEXT NOT NULL,
         type TEXT NOT NULL
       );
-      INSERT INTO expenses (amount, date, description, type) VALUES
-      ('100', '2025-03-08', 'Sample Expense 1', 'food'),
-      ('50', '2025-03-07', 'Sample Expense 2', 'transport');
     `);
   } catch (error) {
     console.error("Database error:", error);

@@ -1,9 +1,17 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import Input from "./Input";
 import Button from "../UI/Button";
 import { getFormattedDate } from "../../util/date";
 import { GlobalStyles } from "../../constants/styles";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   // State initialization
@@ -25,6 +33,9 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       isValid: true,
     },
   });
+
+  // Date Picker visibility state
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // UseEffect to update inputs when defaultValues change (when editing an existing expense)
   useEffect(() => {
@@ -48,7 +59,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
         },
       });
     }
-  }, [defaultValues]); // This will run every time defaultValues change
+  }, [defaultValues]);
 
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {
@@ -96,6 +107,18 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
     !inputs.description.isValid ||
     !inputs.type.isValid;
 
+  const dateChangeHandler = (event, selectedDate) => {
+    setShowDatePicker(false); // Hide the date picker after selecting a date
+    if (selectedDate) {
+      const currentDate = selectedDate || new Date();
+      inputChangedHandler("date", getFormattedDate(currentDate));
+    }
+  };
+
+  const showDatepickerHandler = () => {
+    setShowDatePicker(true); // Show the date picker when the input is pressed
+  };
+
   return (
     <View style={styles.form}>
       <Text style={styles.title}>Your Expense</Text>
@@ -110,17 +133,36 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
             value: inputs.amount.value,
           }}
         />
-        <Input
-          style={styles.rowInput}
-          label="Date"
-          invalid={!inputs.date.isValid}
-          textInputConfig={{
-            placeholder: "YYYY-MM-DD",
-            maxLength: 10,
-            onChangeText: inputChangedHandler.bind(this, "date"),
-            value: inputs.date.value,
-          }}
-        />
+        <View style={styles.rowInput}>
+          {/* TouchableWithoutFeedback to close the keyboard when clicking on date */}
+          <TouchableWithoutFeedback onPress={showDatepickerHandler}>
+            <View style={styles.dateInputContainer}>
+              <Input
+                style={styles.rowInput}
+                label="Date"
+                invalid={!inputs.date.isValid}
+                textInputConfig={{
+                  placeholder: "YYYY-MM-DD",
+                  maxLength: 10,
+                  editable: false, // Make it non-editable to prevent manual input
+                  value: inputs.date.value,
+                }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+
+          {/* Show DateTimePicker when the user taps on the Date Input */}
+          {showDatePicker && (
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={new Date(inputs.date.value || Date.now())}
+              mode="date"
+              is24Hour={true}
+              display="default"
+              onChange={dateChangeHandler}
+            />
+          )}
+        </View>
       </View>
       <View style={styles.inputsRow}>
         <Input
@@ -168,6 +210,7 @@ export default ExpenseForm;
 const styles = StyleSheet.create({
   form: {
     marginTop: 40,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
@@ -179,9 +222,19 @@ const styles = StyleSheet.create({
   inputsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 16,
   },
   rowInput: {
     flex: 1,
+  },
+  dateInputContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  dateLabel: {
+    color: "white",
+    marginBottom: 8,
+    fontSize: 16,
   },
   errorText: {
     textAlign: "center",
