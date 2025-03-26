@@ -4,40 +4,39 @@ import { StyleSheet, TextInput, View } from "react-native";
 import Button from "../components/UI/Button";
 import IconButton from "../components/UI/IconButton";
 import { GlobalStyles } from "../constants/styles";
-import { ExpensesContext } from "../store/expenses-context";
 import { WalletContext } from "../store/wallet-context";
-import ExpenseForm from "../components/ManageExpense/ExpenseForm";
-import { deleteExpense, storeExpense, updateExpense } from "../util/http";
+import WalletForm from "../components/ManageWallet/WalletForm";
+import { deleteWallet, storeWallet, updateWallet } from "../util/http";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
 
-function ManageExpense({ route, navigation }) {
+function ManageWallet({ route, navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
-  const expensesCtx = useContext(ExpensesContext);
+  const walletCtx = useContext(WalletContext);
   const { dispatch } = useContext(WalletContext); // Get dispatch from context
 
-  const editedExpenseId = route.params?.expenseId;
-  const isEditing = !!editedExpenseId;
+  const editedWalletId = route.params?.walletId;
+  const isEditing = !!editedWalletId;
 
-  const selectedExpense = expensesCtx.expenses.find(
-    (expense) => expense.id === editedExpenseId
+  const selectedWallet = walletCtx.wallets.find(
+    (wallet) => wallet.id === editedWalletId
   );
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: isEditing ? "Edit Expense" : "Add Expense",
+      title: isEditing ? "Edit Wallet" : "Add Wallet",
     });
   }, [navigation, isEditing]);
 
-  async function deleteExpenseHandler() {
+  async function deleteWalletHandler() {
     setIsSubmitting(true);
     try {
-      await deleteExpense(editedExpenseId);
-      expensesCtx.deleteExpense(editedExpenseId);
+      await deleteWallet(editedWalletId);
+      walletCtx.deleteWallet(editedWalletId);
       navigation.goBack();
     } catch (error) {
-      setError("Could not delete expense - please try again later!");
+      setError("Could not delete wallet - please try again later!");
       setIsSubmitting(false);
     }
   }
@@ -50,15 +49,15 @@ function ManageExpense({ route, navigation }) {
     navigation.goBack();
   }
 
-  async function confirmHandler(expenseData) {
+  async function confirmHandler(walletData) {
     setIsSubmitting(true);
     try {
       if (isEditing) {
-        expensesCtx.updateExpense(editedExpenseId, expenseData);
-        await updateExpense(editedExpenseId, expenseData);
+        walletCtx.updateWallet(editedWalletId, walletData);
+        await updateWallet(editedWalletId, walletData);
       } else {
-        const id = await storeExpense(expenseData, dispatch);
-        expensesCtx.addExpense({ ...expenseData, id: id });
+        const id = await storeWallet(walletData, dispatch);
+        walletCtx.addWallet({ ...walletData, id: id });
       }
       navigation.goBack();
     } catch (error) {
@@ -77,11 +76,11 @@ function ManageExpense({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <ExpenseForm
+      <WalletForm
         submitButtonLabel={isEditing ? "Update" : "Add"}
         onSubmit={confirmHandler}
         onCancel={cancelHandler}
-        defaultValues={selectedExpense}
+        defaultValues={selectedWallet}
       />
       {isEditing && (
         <View style={styles.deleteContainer}>
@@ -89,7 +88,7 @@ function ManageExpense({ route, navigation }) {
             icon="trash"
             color={GlobalStyles.colors.error500}
             size={36}
-            onPress={deleteExpenseHandler}
+            onPress={deleteWalletHandler}
           />
         </View>
       )}
@@ -97,7 +96,7 @@ function ManageExpense({ route, navigation }) {
   );
 }
 
-export default ManageExpense;
+export default ManageWallet;
 
 const styles = StyleSheet.create({
   container: {

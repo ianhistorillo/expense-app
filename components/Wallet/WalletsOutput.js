@@ -1,26 +1,26 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { GlobalStyles } from "../../constants/styles";
-import ExpensesList from "./ExpensesList";
-import ExpensesSummary from "./ExpensesSummary";
+import WalletList from "./WalletList";
 
-function ExpensesOutput({ expenses, expensesPeriod, fallbackText }) {
-  let content = <Text style={styles.infoText}>{fallbackText}</Text>;
+function WalletsOutput({ wallets }) {
+  let content = (
+    <Text style={styles.infoText}>No wallet found. Please add a wallet</Text>
+  );
 
-  if (expenses.length > 0) {
-    content = <ExpensesList expenses={expenses} />;
+  if (wallets.length > 0) {
+    content = <WalletList wallets={wallets} />;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Recent Transactions </Text>
       {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}
       {content}
     </View>
   );
 }
 
-export default ExpensesOutput;
+export default WalletsOutput;
 
 const styles = StyleSheet.create({
   container: {
@@ -35,13 +35,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 32,
-  },
-  title: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
-    marginTop: 32,
-    marginBottom: 24,
   },
 });

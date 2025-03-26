@@ -4,40 +4,48 @@ import { useNavigation } from "@react-navigation/native";
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
 
-function ExpenseItem({ amount, type, description, date, id }) {
+function WalletItem({
+  name,
+  type,
+  budget,
+  startCutoff,
+  endCutoff,
+  showToDashboard,
+  id,
+}) {
   const navigation = useNavigation();
 
-  function expensePressHandler() {
-    navigation.navigate("ManageExpenses", {
-      expenseId: id,
+  function walletPressHandler() {
+    navigation.navigate("ManageWallet", {
+      walletId: id,
     });
   }
 
   return (
     <Pressable
-      onPress={expensePressHandler}
+      onPress={walletPressHandler}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <View style={styles.expenseItem}>
+      <View style={styles.walletItem}>
         <View>
-          <Text style={[styles.textBase, styles.description]}>{type}</Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+          <Text style={[styles.textBase, styles.description]}>{name}</Text>
+          <Text style={styles.textBase}>{type}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>₱{amount}</Text>
+          <Text style={styles.amount}>₱{budget}</Text>
         </View>
       </View>
     </Pressable>
   );
 }
 
-export default ExpenseItem;
+export default WalletItem;
 
 const styles = StyleSheet.create({
   pressed: {
     opacity: 0.75,
   },
-  expenseItem: {
+  walletItem: {
     padding: 12,
     marginVertical: 8,
     backgroundColor: GlobalStyles.colors.primary500,

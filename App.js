@@ -4,14 +4,20 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-import ManageExpense from "./screens/ManageExpenses";
+import ManageExpenses from "./screens/ManageExpenses";
+import ManageWallet from "./screens/ManageWallet";
 import RecentExpenses from "./screens/RecentExpenses";
+import HomeDashboard from "./screens/HomeDashboard";
 import AllExpenses from "./screens/AllExpenses";
 import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
+import WalletContextProvider from "./store/wallet-context";
+
 import { init } from "./util/database";
+import UserWallets from "./screens/UserWallets";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
@@ -39,27 +45,41 @@ function ExpensesOverview() {
         headerTintColor: "white",
         tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
         tabBarActiveTintColor: GlobalStyles.colors.accent500,
-        headerRight: ({ tintColor }) => (
-          <IconButton
-            icon="add"
-            size={24}
-            color={tintColor}
-            onPress={() => {
-              navigation.navigate("ManageExpense");
-            }}
-          />
-        ),
       })}
     >
       <BottomTabs.Screen
-        name="RecentExpenses"
-        component={RecentExpenses}
+        name="HomeDashboard"
+        component={HomeDashboard}
         options={{
-          title: "Recent Expenses",
-          tabBarLabel: "Recent",
+          title: "Home",
+          tabBarLabel: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="hourglass" size={size} color={color} />
+            <Ionicons name="home" size={size} color={color} />
           ),
+        }}
+      />
+      <BottomTabs.Screen
+        name="UserWallets"
+        component={UserWallets}
+        options={{
+          title: "Your Wallets",
+          tabBarLabel: "Wallet",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="wallet" size={size} color={color} />
+          ),
+          headerRight: () => {
+            const navigation = useNavigation();
+            return (
+              <IconButton
+                icon="add"
+                size={24}
+                color="white"
+                onPress={() => {
+                  navigation.navigate("ManageWallet");
+                }}
+              />
+            );
+          },
         }}
       />
       <BottomTabs.Screen
@@ -71,6 +91,19 @@ function ExpensesOverview() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
           ),
+          headerRight: () => {
+            const navigation = useNavigation();
+            return (
+              <IconButton
+                icon="add"
+                size={24}
+                color="white"
+                onPress={() => {
+                  navigation.navigate("ManageExpenses");
+                }}
+              />
+            );
+          },
         }}
       />
     </BottomTabs.Navigator>
@@ -81,29 +114,40 @@ export default function App() {
   return (
     <React.Fragment>
       <StatusBar style="light" />
-      <ExpensesContextProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-              headerTintColor: "white",
-            }}
-          >
-            <Stack.Screen
-              name="ExpensesOverview"
-              component={ExpensesOverview}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ManageExpense"
-              component={ManageExpense}
-              options={{
-                presentation: "modal",
+      <WalletContextProvider>
+        <ExpensesContextProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: GlobalStyles.colors.primary500,
+                },
+                headerTintColor: "white",
               }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ExpensesContextProvider>
+            >
+              <Stack.Screen
+                name="ExpensesOverview"
+                component={ExpensesOverview}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="ManageWallet"
+                component={ManageWallet}
+                options={{
+                  presentation: "modal",
+                }}
+              />
+              <Stack.Screen
+                name="ManageExpenses"
+                component={ManageExpenses}
+                options={{
+                  presentation: "modal",
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ExpensesContextProvider>
+      </WalletContextProvider>
     </React.Fragment>
   );
 }

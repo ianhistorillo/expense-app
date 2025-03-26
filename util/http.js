@@ -1,24 +1,37 @@
 import axios from "axios";
 import { insertExpenses } from "./database";
+import { insertWallet } from "./database";
 import { updateExpenseItem } from "./database";
 import { fetchListOfExpenses } from "./database";
 import { deleteExpenseById } from "./database";
+
+import { updateWalletItem } from "./database";
+import { fetchListOfWallets } from "./database";
+import { deleteWalletById } from "./database";
+
+import { WalletContext } from "../store/wallet-context";
 import { getFormattedDate } from "./date";
 
 const BACKEND_URL =
   "https://expense-tracker-2c014-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-export async function storeExpense(expenseData) {
-  // const response = await axios.post(
-  //   BACKEND_URL + "/expenses.json",
-  //   expenseData
-  // );
+export async function storeExpense(expenseData, dispatch) {
+  try {
+    const response = await insertExpenses(expenseData);
 
-  const response = await insertExpenses(expenseData);
+    // If you need to use the insertedExpenseId, you can access it like so:
+    const insertedExpenseId = response.insertedExpenseId;
 
-  return response;
-  // const id = response.data.name;
-  // return id;
+    // After the expense is inserted, we need to fetch the updated wallet data
+    const updatedWallets = await fetchListOfWallets();
+
+    // Dispatch the updated wallet list to update the WalletContext
+    dispatch({ type: "SET", payload: updatedWallets });
+
+    return insertedExpenseId; // You can return the ID or any other relevant data
+  } catch (error) {
+    console.error("Error storing expense:", error);
+  }
 }
 
 export async function fetchExpenses() {
@@ -84,4 +97,63 @@ export async function updateExpense(id, expenseData) {
 
 export async function deleteExpense(id) {
   return await deleteExpenseById(id);
+}
+
+export async function storeWallet(walletData, dispatch) {
+  try {
+    const response = await insertWallet(walletData);
+
+    // After the wallet is stored, we need to fetch the updated list of wallets
+    const updatedWallets = await fetchListOfWallets();
+
+    // Dispatch the updated wallet list to update the WalletContext
+    dispatch({ type: "SET", payload: updatedWallets });
+
+    return response;
+  } catch (error) {
+    console.error("Error storing wallet:", error);
+  }
+}
+
+export async function fetchWallet() {
+  // Get the response from the database (array of expenses)
+  const response = await fetchListOfWallets();
+
+  const wallets = [];
+
+  for (const wallet of response) {
+    let formattedDate = null;
+
+    // Check if the date exists and is valid
+    if (wallet.date && wallet.date !== "") {
+      // If the date is valid, format it
+      if (isValidDate(wallet.date)) {
+        formattedDate = getFormattedDate(wallet.date);
+      } else {
+        // console.warn(
+        //   `Invalid date format for expense ID: ${expense.id}. Using fallback.`
+        // );
+        formattedDate = "Invalid date"; // Or set to '0000-00-00'
+      }
+    } else {
+      // If no date value exists, set the fallback value
+      // console.warn(
+      //   `Missing date for expense ID: ${expense.id}. Using fallback.`
+      // );
+      formattedDate = "Invalid date"; // Or set to '0000-00-00'
+    }
+
+    wallets.push(wallet);
+  }
+
+  return wallets;
+}
+
+export async function updateWallet(id, expenseData) {
+  const response = await updateWalletItem(id, expenseData);
+  return response;
+}
+
+export async function deleteWallet(id) {
+  return await deleteWalletById(id);
 }
