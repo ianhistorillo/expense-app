@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
+import { WalletContext } from "../store/wallet-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { getFormattedDate } from "../util/date";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses } from "../util/http";
+import { fetchWallet } from "../util/http";
 import { Alert } from "react-native";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
 import ErrorOverlay from "../components/UI/ErrorOverlay";
@@ -14,6 +16,7 @@ function HomeDashboard() {
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState();
   const expensesCtx = useContext(ExpensesContext);
+  const walletCtx = useContext(WalletContext);
 
   useEffect(() => {
     async function getExpenses() {
@@ -28,6 +31,19 @@ function HomeDashboard() {
     }
 
     getExpenses();
+
+    async function getWallets() {
+      setIsFetching(true);
+      try {
+        const wallets = await fetchWallet();
+        walletCtx.setWallet(wallets);
+      } catch (error) {
+        setError("Could not fetch wallets!");
+      }
+      setIsFetching(false);
+    }
+
+    getWallets();
   }, []);
 
   if (error && !isFetching) {
@@ -49,9 +65,10 @@ function HomeDashboard() {
 
   return (
     <React.Fragment>
-      <MainWallet />
+      <MainWallet wallets={walletCtx.wallets} />
       <ExpensesOutput
         expenses={recentExpenses}
+        screen="Recent Expenses"
         expensesPeriod="Last 7 Days"
         fallbackText="No expenses registered for the last 7 days."
       />

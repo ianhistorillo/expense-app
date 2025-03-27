@@ -135,8 +135,6 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       wallet: inputs.wallet.value,
     };
 
-    console.log("Expenses items: ", expenseData);
-
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
     const dateIsValid = expenseData.date.toString() !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0;

@@ -13,6 +13,21 @@ function ExpenseItem({ amount, type, description, date, id }) {
     });
   }
 
+  // Format the budget with commas and PHP sign
+  const formattedAmount = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(amount);
+
+  const dd = new Date(getFormattedDate(date));
+
+  // Format the date using toLocaleDateString
+  const dateFormat = dd.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <Pressable
       onPress={expensePressHandler}
@@ -21,10 +36,10 @@ function ExpenseItem({ amount, type, description, date, id }) {
       <View style={styles.expenseItem}>
         <View>
           <Text style={[styles.textBase, styles.description]}>{type}</Text>
-          <Text style={styles.textBase}>{getFormattedDate(date)}</Text>
+          <Text style={styles.textBase}>{dateFormat}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>₱{amount}</Text>
+          <Text style={styles.amount}>{formattedAmount}</Text>
         </View>
       </View>
     </Pressable>

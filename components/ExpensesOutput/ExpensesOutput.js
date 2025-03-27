@@ -4,7 +4,7 @@ import { GlobalStyles } from "../../constants/styles";
 import ExpensesList from "./ExpensesList";
 import ExpensesSummary from "./ExpensesSummary";
 
-function ExpensesOutput({ expenses, expensesPeriod, fallbackText }) {
+function ExpensesOutput({ expenses, expensesPeriod, screen, fallbackText }) {
   let content = <Text style={styles.infoText}>{fallbackText}</Text>;
 
   if (expenses.length > 0) {
@@ -13,7 +13,7 @@ function ExpensesOutput({ expenses, expensesPeriod, fallbackText }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Recent Transactions </Text>
+      <Text style={styles.title}> {screen} </Text>
       {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}
       {content}
     </View>

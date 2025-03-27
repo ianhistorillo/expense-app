@@ -21,6 +21,12 @@ function WalletItem({
     });
   }
 
+  // Format the budget with commas and PHP sign
+  const formattedBudget = new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(budget);
+
   return (
     <Pressable
       onPress={walletPressHandler}
@@ -32,7 +38,7 @@ function WalletItem({
           <Text style={styles.textBase}>{type}</Text>
         </View>
         <View style={styles.amountContainer}>
-          <Text style={styles.amount}>₱{budget}</Text>
+          <Text style={styles.amount}>{formattedBudget}</Text>
         </View>
       </View>
     </Pressable>
