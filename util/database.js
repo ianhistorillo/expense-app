@@ -121,8 +121,6 @@ export async function fetchListOfExpenses() {
 }
 
 export async function updateExpenseItem(expenseId, expense) {
-  console.log("Updating: ", expense);
-  console.log("UpdatingID: ", expenseId);
   try {
     const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
     let formattedDate = "Invalid date"; // Default fallback value
@@ -254,8 +252,6 @@ export async function fetchListOfWallets() {
 }
 
 export async function updateWalletItem(walletId, wallet) {
-  console.log("Updating: ", wallet);
-  console.log("UpdatingID: ", walletId);
   try {
     const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
     let formattedSCDate = "Invalid date"; // Default fallback value

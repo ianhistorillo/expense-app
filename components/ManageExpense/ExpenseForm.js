@@ -357,20 +357,20 @@ export default ExpenseForm;
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 40,
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginVertical: 24,
+    marginVertical: 14,
     textAlign: "center",
   },
   inputsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 5,
   },
   rowInput: {
     flex: 1,
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   },
   typeMenu: {
     backgroundColor: "white",
-    padding: 20,
+    padding: 15,
     borderRadius: 8,
     width: "90%", // Adjust width to match the input fields
     maxWidth: 400, // Ensure it doesn't grow too wide

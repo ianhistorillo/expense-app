@@ -398,20 +398,20 @@ export default WalletForm;
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 40,
+    marginTop: 20,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginVertical: 24,
+    marginVertical: 14,
     textAlign: "center",
   },
   inputsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 16,
+    marginBottom: 5,
   },
   rowInput: {
     flex: 1,
