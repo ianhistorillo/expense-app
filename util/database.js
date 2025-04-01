@@ -18,6 +18,18 @@ export async function init() {
       );
     `);
 
+    // Create the table and insert initial data using execAsync
+    await db.execAsync(`
+      PRAGMA journal_mode = WAL;
+      CREATE TABLE IF NOT EXISTS income (
+        id INTEGER PRIMARY KEY NOT NULL,
+        amount TEXT NOT NULL,
+        date TEXT NOT NULL,
+        description TEXT NOT NULL,
+        type TEXT NOT NULL
+      );
+    `);
+
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS wallet (
@@ -173,6 +185,141 @@ export async function deleteExpenseById(expenseId) {
   }
 }
 
+// Income
+
+export async function insertIncome(income) {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+    const formattedDate = getFormattedDate(income.date); // Ensure correct date format
+
+    const result = await db.runAsync(
+      `INSERT INTO income (amount, date, description, type) VALUES (?, ?, ?, ?)`,
+      [income.amount, formattedDate, income.description, income.type] // Bind parameters
+    );
+
+    // Extract relevant data from the result
+    const insertedIncomeId = result.lastInsertRowId; // ID of the newly inserted income
+    const changes = result.changes; // Number of affected rows (should be 1 for insert)
+
+    // Step 2: Fetch the current wallet data to update its budget
+    const walletResult = await db.getFirstAsync(
+      `SELECT * FROM wallet WHERE name = ?`,
+      [income.wallet] // Get the wallet that corresponds to the 'wallet' field in the income
+    );
+
+    if (walletResult) {
+      // Step 3: Calculate the new wallet budget
+      const newBudget = walletResult.budget + income.amount;
+
+      // Step 4: Update the wallet table with the new budget
+      await db.runAsync(
+        `UPDATE wallet SET budget = ? WHERE id = ?`,
+        [newBudget, walletResult.id] // Update the wallet's budget
+      );
+
+      console.log(`Wallet with ID ${walletResult.id} updated successfully.`);
+    } else {
+      console.log(`Wallet named "${income.wallet}" not found.`);
+    }
+
+    // Return only the relevant data (inserted row ID and changes count)
+    return {
+      insertedIncomeId, // ID of the newly inserted income
+      changes, // Number of rows affected by the insert operation
+    };
+  } catch (error) {
+    console.error("Error inserting income:", error);
+    throw error; // Handle or rethrow the error
+  }
+}
+
+export async function fetchListOfIncome() {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+
+    // Fetch all income using getAllAsync
+    const result = await db.getAllAsync("SELECT * FROM income");
+    const incomeItem = [];
+
+    // Format the date and handle missing/invalid dates
+    for (const inc of result) {
+      let formattedDate = null;
+
+      if (inc.date && inc.date.trim() !== "") {
+        const parsedDate = new Date(inc.date);
+        if (!isNaN(parsedDate.getTime())) {
+          formattedDate = getFormattedDate(parsedDate); // Format the date if valid
+        } else {
+          formattedDate = "Invalid date"; // Fallback if the date is invalid
+        }
+      } else {
+        formattedDate = "Invalid date"; // Fallback for missing date
+      }
+
+      incomeItem.push({
+        amount: inc.amount,
+        date: formattedDate,
+        description: inc.description,
+        type: inc.type,
+        id: inc.id,
+      });
+    }
+
+    return incomeItem; // Return the formatted income array
+  } catch (error) {
+    console.error("Error fetching income:", error);
+    throw error; // Handle or rethrow the error
+  }
+}
+
+export async function updateIncomeItem(incomeId, income) {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+    let formattedDate = "Invalid date"; // Default fallback value
+    const incomeItemDate = income.date;
+
+    // Check if the date exists and is valid
+    if (incomeItemDate) {
+      const parsedDate = new Date(incomeItemDate);
+      if (!isNaN(parsedDate.getTime())) {
+        formattedDate = getFormattedDate(parsedDate); // Format if valid
+      } else {
+        console.warn(
+          `Invalid date format for income ID ${incomeId}: ${incomeItemDate}`
+        );
+      }
+    }
+
+    const result = await db.runAsync(
+      `UPDATE income SET amount = ?, description = ?, type = ?, date = ? WHERE id = ?`,
+      [income.amount, income.description, income.type, formattedDate, incomeId] // Bind parameters
+    );
+
+    console.log(`Income with ID ${incomeId} updated successfully.`);
+    return result; // Return result after updating
+  } catch (error) {
+    console.error("Error updating income:", error);
+    throw error; // Handle or rethrow the error
+  }
+}
+
+export async function deleteIncomeById(incomeId) {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+    const result = await db.runAsync(
+      "DELETE FROM income WHERE id = ?;", // SQL query to delete the record
+      [incomeId] // Bind the expenseId to the query
+    );
+
+    console.log(`Expense with ID ${incomeId} deleted successfully.`);
+    return result; // Return result after deletion
+  } catch (error) {
+    console.error("Error deleting income:", error);
+    throw error; // Handle or rethrow the error
+  }
+}
+
+/** Wallet */
 export async function insertWallet(wallet) {
   try {
     const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously

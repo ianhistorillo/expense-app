@@ -7,10 +7,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 import ManageExpenses from "./screens/ManageExpenses";
+import ManageIncome from "./screens/ManageIncome";
 import ManageWallet from "./screens/ManageWallet";
 import RecentExpenses from "./screens/RecentExpenses";
 import HomeDashboard from "./screens/HomeDashboard";
 import AllExpenses from "./screens/AllExpenses";
+import AllIncome from "./screens/AllIncome";
 import { GlobalStyles } from "./constants/styles";
 import IconButton from "./components/UI/IconButton";
 import ExpensesContextProvider from "./store/expenses-context";
@@ -18,6 +20,7 @@ import WalletContextProvider from "./store/wallet-context";
 
 import { init } from "./util/database";
 import UserWallets from "./screens/UserWallets";
+import IncomeContextProvider from "./store/income-context";
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
@@ -106,6 +109,30 @@ function ExpensesOverview() {
           },
         }}
       />
+      <BottomTabs.Screen
+        name="AllIncome"
+        component={AllIncome}
+        options={{
+          title: "All Income",
+          tabBarLabel: "All Income",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cash-outline" size={size} color={color} />
+          ),
+          headerRight: () => {
+            const navigation = useNavigation();
+            return (
+              <IconButton
+                icon="add"
+                size={24}
+                color="white"
+                onPress={() => {
+                  navigation.navigate("ManageIncome");
+                }}
+              />
+            );
+          },
+        }}
+      />
     </BottomTabs.Navigator>
   );
 }
@@ -115,38 +142,47 @@ export default function App() {
     <React.Fragment>
       <StatusBar style="light" />
       <WalletContextProvider>
-        <ExpensesContextProvider>
-          <NavigationContainer>
-            <Stack.Navigator
-              screenOptions={{
-                headerStyle: {
-                  backgroundColor: GlobalStyles.colors.primary500,
-                },
-                headerTintColor: "white",
-              }}
-            >
-              <Stack.Screen
-                name="ExpensesOverview"
-                component={ExpensesOverview}
-                options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                name="ManageWallet"
-                component={ManageWallet}
-                options={{
-                  presentation: "modal",
+        <IncomeContextProvider>
+          <ExpensesContextProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                screenOptions={{
+                  headerStyle: {
+                    backgroundColor: GlobalStyles.colors.primary500,
+                  },
+                  headerTintColor: "white",
                 }}
-              />
-              <Stack.Screen
-                name="ManageExpenses"
-                component={ManageExpenses}
-                options={{
-                  presentation: "modal",
-                }}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </ExpensesContextProvider>
+              >
+                <Stack.Screen
+                  name="ExpensesOverview"
+                  component={ExpensesOverview}
+                  options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="ManageWallet"
+                  component={ManageWallet}
+                  options={{
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="ManageExpenses"
+                  component={ManageExpenses}
+                  options={{
+                    presentation: "modal",
+                  }}
+                />
+                <Stack.Screen
+                  name="ManageIncome"
+                  component={ManageIncome}
+                  options={{
+                    presentation: "modal",
+                  }}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </ExpensesContextProvider>
+        </IncomeContextProvider>
       </WalletContextProvider>
     </React.Fragment>
   );

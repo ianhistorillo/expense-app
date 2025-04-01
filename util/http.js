@@ -9,6 +9,11 @@ import { updateWalletItem } from "./database";
 import { fetchListOfWallets } from "./database";
 import { deleteWalletById } from "./database";
 
+import { insertIncome } from "./database";
+import { updateIncomeItem } from "./database";
+import { fetchListOfIncome } from "./database";
+import { deleteIncomeById } from "./database";
+
 import { WalletContext } from "../store/wallet-context";
 import { getFormattedDate } from "./date";
 
@@ -97,6 +102,80 @@ export async function updateExpense(id, expenseData) {
 
 export async function deleteExpense(id) {
   return await deleteExpenseById(id);
+}
+
+// Income
+
+export async function storeIncome(incomeData, dispatch) {
+  try {
+    const response = await insertIncome(incomeData);
+
+    // If you need to use the insertedExpenseId, you can access it like so:
+    const insertedIncomeId = response.insertedIncomeId;
+
+    // After the expense is inserted, we need to fetch the updated wallet data
+    const updatedWallets = await fetchListOfWallets();
+
+    // Dispatch the updated wallet list to update the WalletContext
+    dispatch({ type: "SET", payload: updatedWallets });
+
+    console.log(insertedIncomeId);
+    return insertedIncomeId; // You can return the ID or any other relevant data
+  } catch (error) {
+    console.error("Error storing expense:", error);
+  }
+}
+
+export async function fetchIncome() {
+  // Get the response from the database (array of income)
+  const response = await fetchListOfIncome();
+
+  const income = [];
+
+  for (const income of response) {
+    let formattedDate = null;
+
+    // Check if the date exists and is valid
+    if (income.date && income.date !== "") {
+      // If the date is valid, format it
+      if (isValidDate(income.date)) {
+        formattedDate = getFormattedDate(income.date);
+      } else {
+        // console.warn(
+        //   `Invalid date format for income ID: ${income.id}. Using fallback.`
+        // );
+        formattedDate = "Invalid date"; // Or set to '0000-00-00'
+      }
+    } else {
+      // If no date value exists, set the fallback value
+      // console.warn(
+      //   `Missing date for income ID: ${income.id}. Using fallback.`
+      // );
+      formattedDate = "Invalid date"; // Or set to '0000-00-00'
+    }
+
+    // // Create an array in the specific format requested
+    // const expenseArray = [
+    //   { amount: parseFloat(expense.amount) },
+    //   { type: expense.type },
+    //   { description: expense.description },
+    //   { date: formattedDate },
+    //   { id: expense.id },
+    // ];
+
+    income.push(income);
+  }
+
+  return income;
+}
+
+export async function updateIncome(id, incomeData) {
+  const response = await updateIncomeItem(id, incomeData);
+  return response;
+}
+
+export async function deleteIncome(id) {
+  return await deleteIncomeById(id);
 }
 
 export async function storeWallet(walletData, dispatch) {
