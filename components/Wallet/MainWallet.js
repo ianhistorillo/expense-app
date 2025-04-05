@@ -92,7 +92,7 @@ function MainWallet({ wallets, totalExpensesAmount }) {
                 type="dashboardIcon"
                 color={GlobalStyles.colors.primary400}
                 onPress={() => {
-                  navigation.navigate("ManageExpenses");
+                  navigation.navigate("ManageWallet");
                 }}
               />
 

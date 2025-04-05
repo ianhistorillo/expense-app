@@ -93,7 +93,7 @@ export async function insertExpenses(expense) {
         console.log(`Wallet with ID ${walletResult.id} updated successfully.`);
       }
     } else {
-      console.log(`Wallet named "${expense.wallet}" not found.`);
+      console.log(`Wallet ID  "${expense.wallet}" not found.`);
     }
 
     // Return only the relevant data (inserted row ID and changes count)
@@ -118,7 +118,7 @@ export async function fetchListOfTotalExpenses() {
 
     let result = "";
 
-    const expensesItem = [];
+    let expensesItem = [];
 
     if (mainWallet) {
       // Fetch all expenses using getAllAsync
@@ -129,16 +129,23 @@ export async function fetchListOfTotalExpenses() {
         `SELECT SUM(amount) AS totalAmount FROM expenses WHERE walletId = ? AND date BETWEEN ? AND ?;`,
         [mainWallet.id, startCutoff, endCutoff] // Pass all parameters as a single array
       );
-      console.log("fetching total expenses on db: ", result);
 
       return result; // Return the formatted expenses array
     } else {
+      expensesItem = [
+        {
+          totalAmount: 0,
+        },
+      ];
+
       console.log(
         `No wallet has been set to dashboard. Please create and set a main wallet`
       );
+
+      return expensesItem;
     }
   } catch (error) {
-    console.error("Error fetching expenses:", error);
+    console.error("Error fetching total expenses:", error);
     throw error; // Handle or rethrow the error
   }
 }
@@ -149,6 +156,7 @@ export async function fetchListOfExpenses() {
 
     // Fetch all expenses using getAllAsync
     const result = await db.getAllAsync("SELECT * FROM expenses");
+
     const expensesItem = [];
 
     // Format the date and handle missing/invalid dates
@@ -393,7 +401,14 @@ export async function insertWallet(wallet) {
       ] // Bind parameters
     );
 
-    return result; // Return the result
+    // Extract relevant data from the result
+    const insertedWalletId = result.lastInsertRowId; // ID of the newly inserted expense
+    const changes = result.changes; // Number of affected rows (should be 1 for insert)
+
+    return {
+      insertedWalletId, // ID of the newly inserted expense
+      changes, // Number of rows affected by the insert operation
+    };
   } catch (error) {
     console.error("Error inserting wallet:", error);
     throw error; // Handle or rethrow the error
@@ -448,7 +463,7 @@ export async function fetchListOfWallets() {
 
     return walletItem; // Return the formatted expenses array
   } catch (error) {
-    console.error("Error fetching expenses:", error);
+    console.error("Error fetching list of wallets:", error);
     throw error; // Handle or rethrow the error
   }
 }

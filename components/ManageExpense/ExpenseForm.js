@@ -213,6 +213,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
     const selectedWallet = walletOptions.find(
       (wallet) => wallet.id === walletId
     );
+
     if (selectedWallet) {
       inputChangedHandler("wallet", selectedWallet.name); // Store the name for display
       setSelectedWalletId(selectedWallet.id); // Store the id for submission

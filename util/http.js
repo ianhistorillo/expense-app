@@ -102,29 +102,29 @@ export async function fetchTotalExpenses() {
 
   const expenses = [];
 
-  for (const expense of response) {
-    let formattedDate = null;
+  if (response[0].totalAmount !== null) {
+    for (const expense of response) {
+      let formattedDate = null;
 
-    // Check if the date exists and is valid
-    if (expense.date && expense.date !== "") {
-      // If the date is valid, format it
-      if (isValidDate(expense.date)) {
-        formattedDate = getFormattedDate(expense.date);
+      // Check if the date exists and is valid
+      if (expense.date && expense.date !== "") {
+        // If the date is valid, format it
+        if (isValidDate(expense.date)) {
+          formattedDate = getFormattedDate(expense.date);
+        } else {
+          formattedDate = "Invalid date"; // Or set to '0000-00-00'
+        }
       } else {
         formattedDate = "Invalid date"; // Or set to '0000-00-00'
       }
-    } else {
-      formattedDate = "Invalid date"; // Or set to '0000-00-00'
+
+      expenses.push(expense);
     }
-
-    expenses.push(expense);
-  }
-
-  if (expenses === null) {
-    return 0;
   } else {
-    return expenses;
+    expenses.push(0);
   }
+
+  return expenses;
 }
 
 // Function to check if a date string is in a valid format 'YYYY-MM-DD'
@@ -225,14 +225,16 @@ export async function deleteIncome(id) {
 export async function storeWallet(walletData, dispatch) {
   try {
     const response = await insertWallet(walletData);
+    console.log("wallet storing response: ", response);
 
     // After the wallet is stored, we need to fetch the updated list of wallets
     // const updatedWallets = await fetchListOfWallets();
 
     // Dispatch the updated wallet list to update the WalletContext
     // dispatch({ type: "SET", payload: updatedWallets });
+    const insertedWalletId = response.insertedWalletId;
 
-    return response;
+    return insertedWalletId;
   } catch (error) {
     console.error("Error storing wallet:", error);
   }
