@@ -120,7 +120,11 @@ export async function fetchTotalExpenses() {
     expenses.push(expense);
   }
 
-  return expenses;
+  if (expenses === null) {
+    return 0;
+  } else {
+    return expenses;
+  }
 }
 
 // Function to check if a date string is in a valid format 'YYYY-MM-DD'

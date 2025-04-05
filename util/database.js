@@ -129,6 +129,7 @@ export async function fetchListOfTotalExpenses() {
         `SELECT SUM(amount) AS totalAmount FROM expenses WHERE walletId = ? AND date BETWEEN ? AND ?;`,
         [mainWallet.id, startCutoff, endCutoff] // Pass all parameters as a single array
       );
+      console.log("fetching total expenses on db: ", result);
 
       return result; // Return the formatted expenses array
     } else {
@@ -394,7 +395,7 @@ export async function insertWallet(wallet) {
 
     return result; // Return the result
   } catch (error) {
-    console.error("Error inserting expense:", error);
+    console.error("Error inserting wallet:", error);
     throw error; // Handle or rethrow the error
   }
 }

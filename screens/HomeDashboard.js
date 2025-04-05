@@ -51,7 +51,7 @@ function HomeDashboard() {
         const totalExpenses = await fetchTotalExpenses();
         expensesCtx.setTotalExpenses(totalExpenses[0].totalAmount);
       } catch (error) {
-        setError("Could not fetch expenses!");
+        setError("Could not fetch total expenses!");
       }
       setIsFetching(false);
     }
