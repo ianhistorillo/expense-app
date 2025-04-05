@@ -14,8 +14,7 @@ function ExpensesOutput({ expenses, expensesPeriod, screen, fallbackText }) {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        {" "}
-        <Text style={styles.title}> {screen} </Text>{" "}
+        <Text style={styles.title}> {screen} </Text>
       </View>
 
       {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}

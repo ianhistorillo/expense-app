@@ -2,10 +2,10 @@ import * as SQLite from "expo-sqlite";
 import { getFormattedDate } from "./date";
 
 export async function init() {
+  console.log("initialization state");
   try {
     // Open the database asynchronously
-    const db = await SQLite.openDatabaseAsync("finance-tracker.db");
-
+    db = await SQLite.openDatabaseAsync("finance-tracker.db");
     // Create the table and insert initial data using execAsync
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
