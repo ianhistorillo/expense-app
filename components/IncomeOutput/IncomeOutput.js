@@ -13,7 +13,9 @@ function IncomeOutput({ income, incomePeriod, screen, fallbackText }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> {screen} </Text>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}> {screen} </Text>
+      </View>
       {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}
       {content}
     </View>
@@ -28,20 +30,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 0,
-    backgroundColor: GlobalStyles.colors.primary700,
+    backgroundColor: GlobalStyles.colors.primary10,
+  },
+  titleContainer: {
+    backgroundColor: GlobalStyles.colors.white,
+    borderRadius: 15,
+    marginTop: 12,
+    marginBottom: 24,
+    padding: 15,
   },
   infoText: {
-    color: "white",
+    color: GlobalStyles.colors.black,
     fontSize: 16,
     textAlign: "center",
     marginTop: 32,
   },
   title: {
-    color: "white",
+    color: GlobalStyles.colors.black,
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
-    marginTop: 32,
-    marginBottom: 24,
   },
 });

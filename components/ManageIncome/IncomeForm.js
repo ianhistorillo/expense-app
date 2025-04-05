@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "white",
+    color: GlobalStyles.colors.black,
     marginVertical: 14,
     textAlign: "center",
   },

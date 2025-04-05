@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   dashboardButtonContainer: {
-    backgroundColor: GlobalStyles.colors.primary100,
+    backgroundColor: GlobalStyles.colors.primary10,
     borderRadius: 30,
     padding: 14,
     marginHorizontal: 8,

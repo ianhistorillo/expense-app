@@ -55,10 +55,10 @@ const styles = StyleSheet.create({
   incomeItem: {
     padding: 12,
     marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.primary500,
+    backgroundColor: GlobalStyles.colors.white,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderRadius: 6,
+    borderRadius: 15,
     elevation: 3,
     shadowColor: GlobalStyles.colors.gray500,
     shadowRadius: 4,
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
   },
   textBase: {
-    color: GlobalStyles.colors.primary50,
+    color: GlobalStyles.colors.black,
   },
   description: {
     fontSize: 16,
@@ -76,14 +76,14 @@ const styles = StyleSheet.create({
   amountContainer: {
     paddingHorizontal: 12,
     paddingVertical: 4,
-    backgroundColor: "white",
+    backgroundColor: GlobalStyles.colors.primary10,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
     minWidth: 80,
   },
   amount: {
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.black,
     fontWeight: "bold",
   },
 });

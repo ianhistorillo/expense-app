@@ -64,7 +64,7 @@ function MainWallet({ wallets, totalExpensesAmount }) {
                 icon="add-outline"
                 size={30}
                 type="dashboardIcon"
-                color={GlobalStyles.colors.primary400}
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageIncome");
                 }}
@@ -77,7 +77,7 @@ function MainWallet({ wallets, totalExpensesAmount }) {
                 icon="navigate-outline"
                 size={30}
                 type="dashboardIcon"
-                color={GlobalStyles.colors.primary400}
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageExpenses");
                 }}
@@ -90,7 +90,7 @@ function MainWallet({ wallets, totalExpensesAmount }) {
                 icon="eye-outline"
                 size={30}
                 type="dashboardIcon"
-                color={GlobalStyles.colors.primary400}
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageWallet");
                 }}
@@ -150,19 +150,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 0,
-    backgroundColor: GlobalStyles.colors.primary700,
+    backgroundColor: GlobalStyles.colors.primary10,
     width: "100%",
   },
   walletContainer: {
     padding: 15,
-    backgroundColor: GlobalStyles.colors.primary50,
+    backgroundColor: GlobalStyles.colors.white,
     borderRadius: 25,
     flexDirection: "row wrap",
     justifyContent: "space-between",
     alignItems: "center",
   },
   statementDateContainer: {
-    backgroundColor: GlobalStyles.colors.primary200,
+    backgroundColor: GlobalStyles.colors.primary100,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   statementText: {
     fontSize: 11,
-    color: GlobalStyles.colors.primary50,
+    color: GlobalStyles.colors.black,
   },
   statementTextTotal: {
     fontWeight: "bold",
@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
   },
   walletMainText: {
     fontSize: 10,
-    color: GlobalStyles.colors.primary400,
+    color: GlobalStyles.colors.black,
     marginBottom: 10,
     textAlign: "center",
   },
   noWalletMainText: {
     fontSize: 15,
-    color: GlobalStyles.colors.primary400,
+    color: GlobalStyles.colors.black,
     marginBottom: 10,
   },
   noWallet: {
@@ -215,6 +215,6 @@ const styles = StyleSheet.create({
   walletAmount: {
     fontSize: 35,
     fontWeight: "bold",
-    color: GlobalStyles.colors.primary500,
+    color: GlobalStyles.colors.black,
   },
 });

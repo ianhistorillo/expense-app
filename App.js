@@ -44,10 +44,10 @@ function ExpensesOverview() {
   return (
     <BottomTabs.Navigator
       screenOptions={({ navigation }) => ({
-        headerStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        headerTintColor: "white",
-        tabBarStyle: { backgroundColor: GlobalStyles.colors.primary500 },
-        tabBarActiveTintColor: GlobalStyles.colors.accent500,
+        headerStyle: { backgroundColor: GlobalStyles.colors.primary10 },
+        headerTintColor: "black",
+        tabBarStyle: { backgroundColor: GlobalStyles.colors.white },
+        tabBarActiveTintColor: GlobalStyles.colors.primary200,
       })}
     >
       <BottomTabs.Screen
@@ -76,7 +76,7 @@ function ExpensesOverview() {
               <IconButton
                 icon="add"
                 size={24}
-                color="white"
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageWallet");
                 }}
@@ -100,7 +100,7 @@ function ExpensesOverview() {
               <IconButton
                 icon="add"
                 size={24}
-                color="white"
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageExpenses");
                 }}
@@ -124,7 +124,7 @@ function ExpensesOverview() {
               <IconButton
                 icon="add"
                 size={24}
-                color="white"
+                color={GlobalStyles.colors.black}
                 onPress={() => {
                   navigation.navigate("ManageIncome");
                 }}
@@ -148,7 +148,7 @@ export default function App() {
               <Stack.Navigator
                 screenOptions={{
                   headerStyle: {
-                    backgroundColor: GlobalStyles.colors.primary500,
+                    backgroundColor: GlobalStyles.colors.white,
                   },
                   headerTintColor: "white",
                 }}
