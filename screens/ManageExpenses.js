@@ -15,7 +15,8 @@ function ManageExpense({ route, navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const expensesCtx = useContext(ExpensesContext);
-  const { dispatch } = useContext(WalletContext); // Get dispatch from context
+  const { dispatch: walletDispatch } = useContext(WalletContext); // Get dispatch from context
+  const { dispatch: expensesDispatch } = useContext(ExpensesContext); // Get dispatch from context
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
@@ -57,7 +58,11 @@ function ManageExpense({ route, navigation }) {
         expensesCtx.updateExpense(editedExpenseId, expenseData);
         await updateExpense(editedExpenseId, expenseData);
       } else {
-        const id = await storeExpense(expenseData, dispatch);
+        const id = await storeExpense(
+          expenseData,
+          walletDispatch,
+          expensesDispatch
+        );
         expensesCtx.addExpense({ ...expenseData, id: id });
       }
       navigation.goBack();

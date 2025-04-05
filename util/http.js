@@ -3,6 +3,7 @@ import { insertExpenses } from "./database";
 import { insertWallet } from "./database";
 import { updateExpenseItem } from "./database";
 import { fetchListOfExpenses } from "./database";
+import { fetchListOfTotalExpenses } from "./database";
 import { deleteExpenseById } from "./database";
 
 import { updateWalletItem } from "./database";
@@ -20,7 +21,11 @@ import { getFormattedDate } from "./date";
 const BACKEND_URL =
   "https://expense-tracker-2c014-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-export async function storeExpense(expenseData, dispatch) {
+export async function storeExpense(
+  expenseData,
+  walletDispatch,
+  expensesDispatch
+) {
   try {
     const response = await insertExpenses(expenseData);
 
@@ -31,7 +36,16 @@ export async function storeExpense(expenseData, dispatch) {
     const updatedWallets = await fetchListOfWallets();
 
     // Dispatch the updated wallet list to update the WalletContext
-    dispatch({ type: "SET", payload: updatedWallets });
+    walletDispatch({ type: "SET", payload: updatedWallets });
+
+    // After the expense is inserted, we need to fetch the updated wallet data
+    const updatedTotalExpenses = await fetchTotalExpenses();
+
+    // Dispatch the updated wallet list to update the WalletContext
+    expensesDispatch({
+      type: "SET_TOTAL",
+      payload: updatedTotalExpenses[0].totalAmount,
+    });
 
     return insertedExpenseId; // You can return the ID or any other relevant data
   } catch (error) {
@@ -82,6 +96,33 @@ export async function fetchExpenses() {
   return expenses;
 }
 
+export async function fetchTotalExpenses() {
+  // Get the response from the database (array of expenses)
+  const response = await fetchListOfTotalExpenses();
+
+  const expenses = [];
+
+  for (const expense of response) {
+    let formattedDate = null;
+
+    // Check if the date exists and is valid
+    if (expense.date && expense.date !== "") {
+      // If the date is valid, format it
+      if (isValidDate(expense.date)) {
+        formattedDate = getFormattedDate(expense.date);
+      } else {
+        formattedDate = "Invalid date"; // Or set to '0000-00-00'
+      }
+    } else {
+      formattedDate = "Invalid date"; // Or set to '0000-00-00'
+    }
+
+    expenses.push(expense);
+  }
+
+  return expenses;
+}
+
 // Function to check if a date string is in a valid format 'YYYY-MM-DD'
 function isValidDate(dateString) {
   // Regular expression for 'YYYY-MM-DD' format
@@ -106,7 +147,7 @@ export async function deleteExpense(id) {
 
 // Income
 
-export async function storeIncome(incomeData, dispatch) {
+export async function storeIncome(incomeData, walletDispatch) {
   try {
     const response = await insertIncome(incomeData);
 
@@ -117,9 +158,8 @@ export async function storeIncome(incomeData, dispatch) {
     const updatedWallets = await fetchListOfWallets();
 
     // Dispatch the updated wallet list to update the WalletContext
-    dispatch({ type: "SET", payload: updatedWallets });
+    walletDispatch({ type: "SET", payload: updatedWallets });
 
-    console.log(insertedIncomeId);
     return insertedIncomeId; // You can return the ID or any other relevant data
   } catch (error) {
     console.error("Error storing expense:", error);
@@ -183,10 +223,10 @@ export async function storeWallet(walletData, dispatch) {
     const response = await insertWallet(walletData);
 
     // After the wallet is stored, we need to fetch the updated list of wallets
-    const updatedWallets = await fetchListOfWallets();
+    // const updatedWallets = await fetchListOfWallets();
 
     // Dispatch the updated wallet list to update the WalletContext
-    dispatch({ type: "SET", payload: updatedWallets });
+    // dispatch({ type: "SET", payload: updatedWallets });
 
     return response;
   } catch (error) {

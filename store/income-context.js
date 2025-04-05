@@ -56,6 +56,7 @@ function IncomeContextProvider({ children }) {
     addIncome: addIncome,
     deleteIncome: deleteIncome,
     updateIncome: updateIncome,
+    dispatch,
   };
 
   return (

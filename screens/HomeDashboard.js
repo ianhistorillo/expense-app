@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-
 import ExpensesOutput from "../components/ExpensesOutput/ExpensesOutput";
 import { WalletContext } from "../store/wallet-context";
 import { ExpensesContext } from "../store/expenses-context";
 import { getFormattedDate } from "../util/date";
 import { getDateMinusDays } from "../util/date";
 import { fetchExpenses } from "../util/http";
+import { fetchTotalExpenses } from "../util/http";
 import { fetchWallet } from "../util/http";
 import { Alert } from "react-native";
 import LoadingOverlay from "../components/UI/LoadingOverlay";
@@ -44,6 +44,19 @@ function HomeDashboard() {
     }
 
     getWallets();
+
+    async function getTotalExpenses() {
+      setIsFetching(true);
+      try {
+        const totalExpenses = await fetchTotalExpenses();
+        expensesCtx.setTotalExpenses(totalExpenses[0].totalAmount);
+      } catch (error) {
+        setError("Could not fetch expenses!");
+      }
+      setIsFetching(false);
+    }
+
+    getTotalExpenses();
   }, []);
 
   if (error && !isFetching) {
@@ -57,15 +70,17 @@ function HomeDashboard() {
   const recentExpenses = expensesCtx.expenses.filter((expense) => {
     const today = new Date();
     const date7DaysAgo = getDateMinusDays(today, 7);
-    const expenseDate = new Date(expense.date); // Make sure date is a valid Date string or format
+    const expenseDate = new Date(expense.date);
 
-    // Ensure you are comparing only the date parts without the time part
     return expenseDate >= date7DaysAgo && expenseDate <= today;
   });
 
   return (
     <React.Fragment>
-      <MainWallet wallets={walletCtx.wallets} />
+      <MainWallet
+        wallets={walletCtx.wallets}
+        totalExpensesAmount={expensesCtx.totalExpenses}
+      />
       <ExpensesOutput
         expenses={recentExpenses}
         screen="Recent Expenses"

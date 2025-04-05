@@ -70,19 +70,16 @@ function IncomeForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   // State for handling the Type dropdown
   const [isWalletMenuVisible, setIsWalletMenuVisible] = useState(false);
 
+  const [selectedWalletId, setSelectedWalletId] = useState("");
+
   // Menu items for the Type selection
   const typeOptions = [
-    { id: "1", name: "Food" },
-    { id: "2", name: "Gasoline" },
-    { id: "3", name: "Online Shopping" },
-    { id: "4", name: "Games" },
-    { id: "5", name: "Subscription" },
-    { id: "6", name: "Utilities" },
-    { id: "7", name: "Loan Payments" },
-    { id: "8", name: "Credit Card Payments" },
-    { id: "9", name: "Health" },
-    { id: "10", name: "Family Allowance" },
-    { id: "11", name: "Others" },
+    { id: "1", name: "Salary" },
+    { id: "2", name: "Allowance" },
+    { id: "3", name: "Side Job" },
+    { id: "4", name: "Investment" },
+    { id: "5", name: "Business Profit" },
+    { id: "6", name: "Others" },
   ];
 
   const walletOptions = walletCtx.wallets;
@@ -118,10 +115,13 @@ function IncomeForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   // Input change handler
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {
-      return {
-        ...curInputs,
-        [inputIdentifier]: { value: enteredValue, isValid: true },
-      };
+      if (curInputs[inputIdentifier].value !== enteredValue) {
+        return {
+          ...curInputs,
+          [inputIdentifier]: { value: enteredValue, isValid: true },
+        };
+      }
+      return curInputs;
     });
   }
 
@@ -132,7 +132,7 @@ function IncomeForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       date: new Date(inputs.date.value),
       description: inputs.description.value,
       type: inputs.type.value,
-      wallet: inputs.wallet.value,
+      wallet: selectedWalletId,
     };
 
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
@@ -204,8 +204,14 @@ function IncomeForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   };
 
   // Select a wallet from the menu
-  const selectWalletHandler = (wallet) => {
-    inputChangedHandler("wallet", wallet);
+  const selectWalletHandler = (walletId) => {
+    const selectedWallet = walletOptions.find(
+      (wallet) => wallet.id === walletId
+    );
+    if (selectedWallet) {
+      inputChangedHandler("wallet", selectedWallet.name); // Store the name for display
+      setSelectedWalletId(selectedWallet.id); // Store the id for submission
+    }
     toggleWalletMenu();
   };
 
@@ -313,7 +319,7 @@ function IncomeForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
                   {walletOptions.map((item) => (
                     <TouchableOpacity
                       key={item.id}
-                      onPress={() => selectWalletHandler(item.name)}
+                      onPress={() => selectWalletHandler(item.id)}
                       style={styles.menuItem}
                     >
                       <Text style={styles.menuItemText}>{item.name}</Text>

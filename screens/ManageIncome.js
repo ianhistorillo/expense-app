@@ -15,7 +15,7 @@ function ManageIncome({ route, navigation }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState();
   const incomeCtx = useContext(IncomeContext);
-  const { dispatch } = useContext(WalletContext); // Get dispatch from context
+  const { dispatch: walletDispatch } = useContext(WalletContext); // Get dispatch from context
 
   const editedIncomeId = route.params?.incomeId;
   const isEditing = !!editedIncomeId;
@@ -57,7 +57,7 @@ function ManageIncome({ route, navigation }) {
         incomeCtx.updateIncome(editedIncomeId, incomeData);
         await updateIncome(editedIncomeId, incomeData);
       } else {
-        const id = await storeIncome(incomeData, dispatch);
+        const id = await storeIncome(incomeData, walletDispatch);
         incomeCtx.addIncome({ ...incomeData, id: id });
       }
       navigation.goBack();

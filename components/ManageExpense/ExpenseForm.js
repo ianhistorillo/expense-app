@@ -70,6 +70,8 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   // State for handling the Type dropdown
   const [isWalletMenuVisible, setIsWalletMenuVisible] = useState(false);
 
+  const [selectedWalletId, setSelectedWalletId] = useState("");
+
   // Menu items for the Type selection
   const typeOptions = [
     { id: "1", name: "Food" },
@@ -118,10 +120,13 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   // Input change handler
   function inputChangedHandler(inputIdentifier, enteredValue) {
     setInputs((curInputs) => {
-      return {
-        ...curInputs,
-        [inputIdentifier]: { value: enteredValue, isValid: true },
-      };
+      if (curInputs[inputIdentifier].value !== enteredValue) {
+        return {
+          ...curInputs,
+          [inputIdentifier]: { value: enteredValue, isValid: true },
+        };
+      }
+      return curInputs;
     });
   }
 
@@ -132,7 +137,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
       date: new Date(inputs.date.value),
       description: inputs.description.value,
       type: inputs.type.value,
-      wallet: inputs.wallet.value,
+      wallet: selectedWalletId,
     };
 
     const amountIsValid = !isNaN(expenseData.amount) && expenseData.amount > 0;
@@ -204,8 +209,14 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
   };
 
   // Select a wallet from the menu
-  const selectWalletHandler = (wallet) => {
-    inputChangedHandler("wallet", wallet);
+  const selectWalletHandler = (walletId) => {
+    const selectedWallet = walletOptions.find(
+      (wallet) => wallet.id === walletId
+    );
+    if (selectedWallet) {
+      inputChangedHandler("wallet", selectedWallet.name); // Store the name for display
+      setSelectedWalletId(selectedWallet.id); // Store the id for submission
+    }
     toggleWalletMenu();
   };
 
@@ -313,7 +324,7 @@ function ExpenseForm({ submitButtonLabel, onCancel, onSubmit, defaultValues }) {
                   {walletOptions.map((item) => (
                     <TouchableOpacity
                       key={item.id}
-                      onPress={() => selectWalletHandler(item.name)}
+                      onPress={() => selectWalletHandler(item.id)}
                       style={styles.menuItem}
                     >
                       <Text style={styles.menuItemText}>{item.name}</Text>

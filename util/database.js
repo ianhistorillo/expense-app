@@ -13,6 +13,7 @@ export async function init() {
         id INTEGER PRIMARY KEY NOT NULL,
         amount TEXT NOT NULL,
         date TEXT NOT NULL,
+        walletId INTEGER NOT NULL,
         description TEXT NOT NULL,
         type TEXT NOT NULL
       );
@@ -25,6 +26,7 @@ export async function init() {
         id INTEGER PRIMARY KEY NOT NULL,
         amount TEXT NOT NULL,
         date TEXT NOT NULL,
+        walletId INTEGER NOT NULL,
         description TEXT NOT NULL,
         type TEXT NOT NULL
       );
@@ -53,8 +55,14 @@ export async function insertExpenses(expense) {
     const formattedDate = getFormattedDate(expense.date); // Ensure correct date format
 
     const result = await db.runAsync(
-      `INSERT INTO expenses (amount, date, description, type) VALUES (?, ?, ?, ?)`,
-      [expense.amount, formattedDate, expense.description, expense.type] // Bind parameters
+      `INSERT INTO expenses (amount, date, walletId, description, type) VALUES (?, ?, ?, ?, ?)`,
+      [
+        expense.amount,
+        formattedDate,
+        expense.wallet,
+        expense.description,
+        expense.type,
+      ] // Bind parameters
     );
 
     // Extract relevant data from the result
@@ -63,21 +71,27 @@ export async function insertExpenses(expense) {
 
     // Step 2: Fetch the current wallet data to update its budget
     const walletResult = await db.getFirstAsync(
-      `SELECT * FROM wallet WHERE name = ?`,
+      `SELECT * FROM wallet WHERE id = ?`,
       [expense.wallet] // Get the wallet that corresponds to the 'wallet' field in the expense
     );
 
     if (walletResult) {
       // Step 3: Calculate the new wallet budget
-      const newBudget = walletResult.budget - expense.amount;
 
-      // Step 4: Update the wallet table with the new budget
-      await db.runAsync(
-        `UPDATE wallet SET budget = ? WHERE id = ?`,
-        [newBudget, walletResult.id] // Update the wallet's budget
-      );
+      const startCutoff = getFormattedDate(walletResult.startCutoff); // Ensure correct date format
+      const endCutoff = getFormattedDate(walletResult.endCutoff); // Ensure correct date format
+      const expenseDate = getFormattedDate(expense.date);
 
-      console.log(`Wallet with ID ${walletResult.id} updated successfully.`);
+      // Check if the expense date is within the cutoff range (inclusive)
+      if (expenseDate >= startCutoff && expenseDate <= endCutoff) {
+        const newBudget = walletResult.budget - expense.amount; // Deduct expense from budget
+        // Step 4: Update the wallet table with the new budget
+        await db.runAsync(
+          `UPDATE wallet SET budget = ? WHERE id = ?`,
+          [newBudget, walletResult.id] // Update the wallet's budget
+        );
+        console.log(`Wallet with ID ${walletResult.id} updated successfully.`);
+      }
     } else {
       console.log(`Wallet named "${expense.wallet}" not found.`);
     }
@@ -89,6 +103,41 @@ export async function insertExpenses(expense) {
     };
   } catch (error) {
     console.error("Error inserting expense:", error);
+    throw error; // Handle or rethrow the error
+  }
+}
+
+export async function fetchListOfTotalExpenses() {
+  try {
+    const db = await SQLite.openDatabaseAsync("finance-tracker.db"); // Open database asynchronously
+
+    // Step 2: Fetch the current wallet data to update its budget
+    const mainWallet = await db.getFirstAsync(
+      `SELECT * FROM wallet WHERE showToDashboard = "Yes"` // Get the wallet that corresponds to the 'wallet' field in the expense
+    );
+
+    let result = "";
+
+    const expensesItem = [];
+
+    if (mainWallet) {
+      // Fetch all expenses using getAllAsync
+      const startCutoff = getFormattedDate(mainWallet.startCutoff);
+      const endCutoff = getFormattedDate(mainWallet.endCutoff);
+
+      result = await db.getAllAsync(
+        `SELECT SUM(amount) AS totalAmount FROM expenses WHERE walletId = ? AND date BETWEEN ? AND ?;`,
+        [mainWallet.id, startCutoff, endCutoff] // Pass all parameters as a single array
+      );
+
+      return result; // Return the formatted expenses array
+    } else {
+      console.log(
+        `No wallet has been set to dashboard. Please create and set a main wallet`
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
     throw error; // Handle or rethrow the error
   }
 }
@@ -120,6 +169,7 @@ export async function fetchListOfExpenses() {
         amount: exp.amount,
         date: formattedDate,
         description: exp.description,
+        walletId: exp.walletId,
         type: exp.type,
         id: exp.id,
       });
@@ -193,8 +243,14 @@ export async function insertIncome(income) {
     const formattedDate = getFormattedDate(income.date); // Ensure correct date format
 
     const result = await db.runAsync(
-      `INSERT INTO income (amount, date, description, type) VALUES (?, ?, ?, ?)`,
-      [income.amount, formattedDate, income.description, income.type] // Bind parameters
+      `INSERT INTO income (amount, date, walletId, description, type) VALUES (?, ?, ?, ?, ?)`,
+      [
+        income.amount,
+        formattedDate,
+        income.wallet,
+        income.description,
+        income.type,
+      ] // Bind parameters
     );
 
     // Extract relevant data from the result
@@ -203,20 +259,18 @@ export async function insertIncome(income) {
 
     // Step 2: Fetch the current wallet data to update its budget
     const walletResult = await db.getFirstAsync(
-      `SELECT * FROM wallet WHERE name = ?`,
+      `SELECT * FROM wallet WHERE id = ?`,
       [income.wallet] // Get the wallet that corresponds to the 'wallet' field in the income
     );
 
     if (walletResult) {
       // Step 3: Calculate the new wallet budget
-      const newBudget = walletResult.budget + income.amount;
-
+      const newBudget = walletResult.budget + income.amount; // Deduct income from budget
       // Step 4: Update the wallet table with the new budget
       await db.runAsync(
         `UPDATE wallet SET budget = ? WHERE id = ?`,
         [newBudget, walletResult.id] // Update the wallet's budget
       );
-
       console.log(`Wallet with ID ${walletResult.id} updated successfully.`);
     } else {
       console.log(`Wallet named "${income.wallet}" not found.`);
