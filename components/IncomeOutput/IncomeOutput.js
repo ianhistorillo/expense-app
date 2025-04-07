@@ -16,8 +16,10 @@ function IncomeOutput({ income, incomePeriod, screen, fallbackText }) {
       <View style={styles.titleContainer}>
         <Text style={styles.title}> {screen} </Text>
       </View>
-      {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}
-      {content}
+      <View style={styles.listContainer}>
+        {/* <ExpensesSummary expenses={expenses} periodName={expensesPeriod} /> */}
+        {content}
+      </View>
     </View>
   );
 }
@@ -50,5 +52,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
+  },
+  listContainer: {
+    backgroundColor: GlobalStyles.colors.primary30,
+    paddingBottom: 10,
+    paddingTop: 10,
+    paddingLeft: 5,
+    paddingRight: 5,
+    borderRadius: 20,
   },
 });

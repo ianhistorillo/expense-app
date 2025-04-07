@@ -86,10 +86,10 @@ const styles = StyleSheet.create({
   },
   expenseItem: {
     padding: 20,
+    backgroundColor: GlobalStyles.colors.primary30,
     marginVertical: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderRadius: 15,
     elevation: 31,
     borderBottomWidth: 1,
     borderBottomColor: GlobalStyles.colors.primary10,
