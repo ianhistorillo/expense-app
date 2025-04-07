@@ -364,7 +364,7 @@ export default IncomeForm;
 const styles = StyleSheet.create({
   form: {
     marginTop: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
   },
   title: {
     fontSize: 24,
