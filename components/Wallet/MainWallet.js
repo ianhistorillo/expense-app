@@ -126,7 +126,7 @@ function MainWallet({ wallets, totalExpensesAmount }) {
             <IconButton
               icon="add-circle-outline"
               size={40}
-              color={GlobalStyles.colors.primary400}
+              color={GlobalStyles.colors.black}
               onPress={() => {
                 navigation.navigate("ManageWallet");
               }}

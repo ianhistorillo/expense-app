@@ -3,7 +3,7 @@ export const GlobalStyles = {
     white: "#ffffff",
     black: "#2a2c2d",
     primary10: "#cbd8d7",
-    primary30: "#e0e5d5",
+    primary30: "#eaf7f6",
     primary50: "#d1d8c0",
     primary100: "#c5f8f5",
     primary200: "#26f4e6",

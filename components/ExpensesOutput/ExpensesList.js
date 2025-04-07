@@ -1,14 +1,18 @@
 import { FlatList } from "react-native";
-
 import ExpenseItem from "./ExpenseItem";
-import { getFormattedDate } from "../../util/date";
-
-function renderExpenseItem(itemData) {
-  return <ExpenseItem {...itemData.item} />;
-}
 
 function ExpensesList({ expenses }) {
-  // Convert array of arrays into an array of objects
+  // Use FlatList's renderItem and pass index to determine the last item
+  function renderExpenseItem(itemData) {
+    const index = itemData.index; // Get the index of the current item
+    return (
+      <ExpenseItem
+        key={itemData.item.id}
+        isLast={index === expenses.length - 1} // Pass true for last item
+        {...itemData.item} // Spread the expense data
+      />
+    );
+  }
 
   return (
     <FlatList

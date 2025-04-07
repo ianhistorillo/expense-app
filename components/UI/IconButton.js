@@ -14,6 +14,17 @@ function IconButton({ icon, type, color, size, onPress }) {
         </View>
       </Pressable>
     );
+  } else if (type === "itemIcon") {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => pressed && styles.pressed}
+      >
+        <View style={styles.itemIcon}>
+          <Ionicons name={icon} size={size} color={color} />
+        </View>
+      </Pressable>
+    );
   } else {
     return (
       <Pressable
@@ -43,6 +54,13 @@ const styles = StyleSheet.create({
     padding: 14,
     marginHorizontal: 8,
     marginVertical: 2,
+  },
+  itemIcon: {
+    backgroundColor: GlobalStyles.colors.primary10,
+    borderRadius: 30,
+    padding: 10,
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   pressed: {
     opacity: 0.75,

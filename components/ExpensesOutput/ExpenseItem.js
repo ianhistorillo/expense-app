@@ -3,9 +3,12 @@ import { useNavigation } from "@react-navigation/native";
 
 import { GlobalStyles } from "../../constants/styles";
 import { getFormattedDate } from "../../util/date";
+import IconButton from "../UI/IconButton";
 
-function ExpenseItem({ amount, type, description, date, id }) {
+function ExpenseItem({ amount, type, description, date, id, isLast }) {
   const navigation = useNavigation();
+
+  console.log("Type? ", type);
 
   function expensePressHandler() {
     navigation.navigate("ManageExpenses", {
@@ -13,7 +16,6 @@ function ExpenseItem({ amount, type, description, date, id }) {
     });
   }
 
-  // Format the budget with commas and PHP sign
   const formattedAmount = new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
@@ -21,20 +23,47 @@ function ExpenseItem({ amount, type, description, date, id }) {
 
   const dd = new Date(getFormattedDate(date));
 
-  // Format the date using toLocaleDateString
   const dateFormat = dd.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
+  // Mapping of types to icons
+  const typeToIconMap = {
+    Food: "pizza-outline",
+    Gasoline: "car-outline",
+    "Online Shopping": "cart-outline",
+    Games: "game-controller-outline",
+    Subscription: "cloud-outline",
+    Utilities: "flash-outline",
+    "Loan Payments": "wallet-outline",
+    "Credit Card Payments": "wallet-outline",
+    Health: "medkit-outline",
+    "Family Allowance": "logo-usd",
+    Others: "build-outline",
+  };
+
+  // Function to get the icon based on the type
+  const getIconForType = (type) => {
+    return typeToIconMap[type] || "default-icon"; // "default-icon" is a fallback if type is not found
+  };
+
   return (
     <Pressable
       onPress={expensePressHandler}
       style={({ pressed }) => pressed && styles.pressed}
     >
-      <View style={styles.expenseItem}>
-        <View>
+      <View style={[styles.expenseItem, isLast ? styles.noBorder : null]}>
+        <View style={styles.expenseContainerIcon}>
+          <IconButton
+            icon={getIconForType(type)}
+            size={15}
+            type="itemIcon"
+            color={GlobalStyles.colors.black}
+          />
+        </View>
+        <View style={styles.descStyle}>
           <Text style={[styles.textBase, styles.description]}>{type}</Text>
           <Text style={styles.textBase}>{dateFormat}</Text>
         </View>
@@ -52,18 +81,25 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.75,
   },
+  expenseContainerIcon: {
+    width: "11%",
+  },
   expenseItem: {
-    padding: 12,
-    marginVertical: 8,
-    backgroundColor: GlobalStyles.colors.white,
+    padding: 20,
+    marginVertical: 0,
     flexDirection: "row",
     justifyContent: "space-between",
     borderRadius: 15,
-    elevation: 3,
-    shadowColor: GlobalStyles.colors.gray500,
-    shadowRadius: 4,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.4,
+    elevation: 31,
+    borderBottomWidth: 1,
+    borderBottomColor: GlobalStyles.colors.primary10,
+  },
+  descStyle: {
+    width: "45%",
+    textAlign: "left",
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   textBase: {
     color: GlobalStyles.colors.black,
@@ -74,12 +110,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   amountContainer: {
+    width: "35%",
     paddingHorizontal: 12,
     paddingVertical: 4,
     backgroundColor: GlobalStyles.colors.primary10,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 4,
+    borderRadius: 8,
     minWidth: 80,
   },
   amount: {
